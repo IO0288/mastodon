@@ -37,16 +37,16 @@ jobs:
           # build-args: |
           #   arg1=value1
           #   arg2=value2
-          cache-from: type=registry,ref=mashirozx/mastodon:dev
+          cache-from: type=registry,ref=IO0288/mastodon:dev
           cache-to: type=inline
           tags: |
-            mashirozx/mastodon:dev
-            mashirozx/mastodon:dev-${{steps.vars.outputs.sha_short}}
+            IO0288/mastodon:dev
+            IO0288/mastodon:dev-${{steps.vars.outputs.sha_short}}
 
       # - name: ⚓ Build and push Docker images
       #   uses: docker/build-push-action@v1
       #   with:
       #     username: ${{ secrets.DOCKER_USERNAME }}
       #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: mashirozx/mastodon
+      #     repository: IO0288/mastodon
       #     tags: alpha
