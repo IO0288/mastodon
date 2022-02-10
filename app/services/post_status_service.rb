@@ -212,6 +212,10 @@ class PostStatusService < BaseService
     nil
   end
 
+  def language_from_option(str)
+    ISO_639.find(str)&.alpha2
+  end
+
   def process_mentions_service
     ProcessMentionsService.new
   end

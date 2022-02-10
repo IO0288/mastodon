@@ -82,6 +82,25 @@ class ProcessMentionsService < BaseService
   end
 
   def mention_undeliverable?(mentioned_account)
-    mentioned_account.nil? || (!mentioned_account.local? && !mentioned_account.activitypub?)
+    mentioned_account.nil? || (!mentioned_account.local? && mentioned_account.ostatus?)
+  end
+
+  def create_notification(mention)
+    mentioned_account = mention.account
+
+    if mentioned_account.local?
+      LocalNotificationWorker.perform_async(mentioned_account.id, mention.id, mention.class.name, :mention)
+    elsif mentioned_account.activitypub? && !@status.local_only?
+      ActivityPub::DeliveryWorker.perform_async(activitypub_json, mention.status.account_id, mentioned_account.inbox_url, { synchronize_followers: !mention.status.distributable? })
+    end
+  end
+
+  def activitypub_json
+    return @activitypub_json if defined?(@activitypub_json)
+    @activitypub_json = Oj.dump(serialize_payload(ActivityPub::ActivityPresenter.from_status(@status), ActivityPub::ActivitySerializer, signer: @status.account))
+  end
+
+  def resolve_account_service
+    ResolveAccountService.new
   end
 end
